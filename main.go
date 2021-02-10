@@ -192,16 +192,17 @@ var mutationType = graphql.NewObject(
 				},
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					id, _ := params.Args["id"].(int)
-					// var product = Product{}
+					var product = Product{}
 
 					for i, v := range products {
 						if int64(id) == v.ID {
+							product = products[i]
 							products = append(products[:i], products[i+1:]...)
 							break
 						}
 					}
 
-					return "success deleted", nil
+					return product, nil
 				},
 			},
 
@@ -275,16 +276,17 @@ var mutationType = graphql.NewObject(
 				},
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					id, _ := params.Args["id"].(int)
-					// var product = Product{}
+					var user = User{}
 
 					for i, v := range users {
 						if int64(id) == v.ID {
+							user = users[i]
 							users = append(users[:i], users[i+1:]...)
 							break
 						}
 					}
 
-					return "success deleted", nil
+					return user, nil
 				},
 			},
 			// *  =================== END OF USER MUTATION ===================================== //
