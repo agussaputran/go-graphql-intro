@@ -145,7 +145,7 @@ var mutationType = graphql.NewObject(
 			},
 			"update_product": &graphql.Field{
 				Type:        productType,
-				Description: "Update product",
+				Description: "update product",
 				Args: graphql.FieldConfigArgument{
 					"id": &graphql.ArgumentConfig{
 						Type: graphql.NewNonNull(graphql.Int),
@@ -182,29 +182,29 @@ var mutationType = graphql.NewObject(
 					return product, nil
 				},
 			},
-
 			"delete_product": &graphql.Field{
 				Type:        productType,
 				Description: "delete product",
 				Args: graphql.FieldConfigArgument{
 					"id": &graphql.ArgumentConfig{
 						Type: graphql.NewNonNull(graphql.Int),
+					},
 				},
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					id, _ := params.Args["id"].(int)
-
-					var product = Product{}
+					// var product = Product{}
 
 					for i, v := range products {
 						if int64(id) == v.ID {
-							products = RemoveIndex(products, i)
+							products = append(products[:i], products[i+1:]...)
 							break
 						}
 					}
 
-					return product, nil
+					return "success deleted", nil
 				},
 			},
+
 			//* =================== END OF PRODUCT MUTATION ===================================== //
 
 			// *  =================== USER MUTATION ===================================== //
@@ -233,7 +233,7 @@ var mutationType = graphql.NewObject(
 
 			"update_user": &graphql.Field{
 				Type:        userType,
-				Description: "Create new product",
+				Description: "update user",
 				Args: graphql.FieldConfigArgument{
 					"id": &graphql.ArgumentConfig{
 						Type: graphql.NewNonNull(graphql.Int),
@@ -263,6 +263,28 @@ var mutationType = graphql.NewObject(
 					}
 
 					return user, nil
+				},
+			},
+			"delete_user": &graphql.Field{
+				Type:        userType,
+				Description: "delete user",
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+					id, _ := params.Args["id"].(int)
+					// var product = Product{}
+
+					for i, v := range users {
+						if int64(id) == v.ID {
+							users = append(users[:i], users[i+1:]...)
+							break
+						}
+					}
+
+					return "success deleted", nil
 				},
 			},
 			// *  =================== END OF USER MUTATION ===================================== //
@@ -310,9 +332,4 @@ func main() {
 		c.JSON(http.StatusOK, result)
 	})
 	r.Run()
-}
-
-// RemoveIndex func
-func RemoveIndex(s []string, index int) []string {
-	return append(s[:index], s[index+1:]...)
 }
