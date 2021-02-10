@@ -185,36 +185,19 @@ var mutationType = graphql.NewObject(
 
 			"delete_product": &graphql.Field{
 				Type:        productType,
-				Description: "Create new product",
+				Description: "delete product",
 				Args: graphql.FieldConfigArgument{
 					"id": &graphql.ArgumentConfig{
 						Type: graphql.NewNonNull(graphql.Int),
-					},
-					"name": &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-					"info": &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-					"price": &graphql.ArgumentConfig{
-						Type: graphql.Float,
-					},
 				},
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					id, _ := params.Args["id"].(int)
-					name, _ := params.Args["name"].(string)
-					info, _ := params.Args["info"].(string)
-					price, _ := params.Args["price"].(float64)
 
 					var product = Product{}
 
 					for i, v := range products {
 						if int64(id) == v.ID {
-							products[i].Name = name
-							products[i].Info = info
-							products[i].Price = price
-
-							product = products[i]
+							products = RemoveIndex(products, i)
 							break
 						}
 					}
