@@ -202,8 +202,7 @@ var mutationType = graphql.NewObject(
 			"delete_user": &graphql.Field{
 				Type:        types.UserType(),
 				Description: "delete user",
-				Args: gqlargs.DeleteUserArgs(),
-				},
+				Args:        gqlargs.DeleteUserArgs(),
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					id, _ := params.Args["id"].(int)
 					var user = User{}
@@ -224,11 +223,7 @@ var mutationType = graphql.NewObject(
 			"create_province": &graphql.Field{
 				Type:        types.ProvinceType(),
 				Description: "Create new province",
-				Args: graphql.FieldConfigArgument{
-					"name": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.String),
-					},
-				},
+				Args:        gqlargs.CreateProvinceArgs(),
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					db := connection.Connect()
 					rand.Seed(time.Now().UnixNano())
@@ -245,14 +240,7 @@ var mutationType = graphql.NewObject(
 			"update_province": &graphql.Field{
 				Type:        types.ProvinceType(),
 				Description: "update province",
-				Args: graphql.FieldConfigArgument{
-					"id": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.Int),
-					},
-					"name": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.String),
-					},
-				},
+				Args:        gqlargs.UpdateProvinceArgs(),
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					db := connection.Connect()
 					id, _ := params.Args["id"].(int)
@@ -268,11 +256,7 @@ var mutationType = graphql.NewObject(
 			"delete_province": &graphql.Field{
 				Type:        types.ProvinceType(),
 				Description: "delete province",
-				Args: graphql.FieldConfigArgument{
-					"id": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.Int),
-					},
-				},
+				Args:        gqlargs.DeleteProvinceArgs(),
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					db := connection.Connect()
 					id, _ := params.Args["id"].(int)
