@@ -4,6 +4,7 @@ import (
 	"graphql-intro/connection"
 	"graphql-intro/models"
 	"graphql-intro/seeders"
+	"graphql-intro/types"
 	"log"
 	"math/rand"
 	"net/http"
@@ -55,57 +56,6 @@ var users = []User{
 	},
 }
 
-var productType = graphql.NewObject(
-	graphql.ObjectConfig{
-		Name: "Product",
-		Fields: graphql.Fields{
-			"id": &graphql.Field{
-				Type: graphql.Int,
-			},
-			"name": &graphql.Field{
-				Type: graphql.String,
-			},
-			"info": &graphql.Field{
-				Type: graphql.String,
-			},
-			"price": &graphql.Field{
-				Type: graphql.Float,
-			},
-		},
-	},
-)
-
-var userType = graphql.NewObject(
-	graphql.ObjectConfig{
-		Name: "User",
-		Fields: graphql.Fields{
-			"id": &graphql.Field{
-				Type: graphql.Int,
-			},
-			"name": &graphql.Field{
-				Type: graphql.String,
-			},
-			"age": &graphql.Field{
-				Type: graphql.Int,
-			},
-		},
-	},
-)
-
-var districtType = graphql.NewObject(
-	graphql.ObjectConfig{
-		Name: "District",
-		Fields: graphql.Fields{
-			"id": &graphql.Field{
-				Type: graphql.Int,
-			},
-			"name": &graphql.Field{
-				Type: graphql.String,
-			},
-		},
-	},
-)
-
 var provinceType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "Province",
@@ -117,7 +67,7 @@ var provinceType = graphql.NewObject(
 				Type: graphql.String,
 			},
 			"districts": &graphql.Field{
-				Type: graphql.NewList(districtType),
+				Type: graphql.NewList(types.DistrictType()),
 			},
 		},
 	},
@@ -128,14 +78,14 @@ var queryType = graphql.NewObject(
 		Name: "Query",
 		Fields: graphql.Fields{
 			"product_list": &graphql.Field{
-				Type:        graphql.NewList(productType),
+				Type:        graphql.NewList(types.ProductType()),
 				Description: "Get Product List",
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					return products, nil
 				},
 			},
 			"user_list": &graphql.Field{
-				Type:        graphql.NewList(userType),
+				Type:        graphql.NewList(types.UserType()),
 				Description: "Get User List",
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					return users, nil
@@ -161,7 +111,7 @@ var mutationType = graphql.NewObject(
 		Fields: graphql.Fields{
 			//* =================== PRODUCT MUTATION ===================================== //
 			"create_product": &graphql.Field{
-				Type:        productType,
+				Type:        types.ProductType(),
 				Description: "Create new product",
 				Args: graphql.FieldConfigArgument{
 					"name": &graphql.ArgumentConfig{
@@ -187,7 +137,7 @@ var mutationType = graphql.NewObject(
 				},
 			},
 			"update_product": &graphql.Field{
-				Type:        productType,
+				Type:        types.ProductType(),
 				Description: "update product",
 				Args: graphql.FieldConfigArgument{
 					"id": &graphql.ArgumentConfig{
@@ -226,7 +176,7 @@ var mutationType = graphql.NewObject(
 				},
 			},
 			"delete_product": &graphql.Field{
-				Type:        productType,
+				Type:        types.ProductType(),
 				Description: "delete product",
 				Args: graphql.FieldConfigArgument{
 					"id": &graphql.ArgumentConfig{
@@ -253,7 +203,7 @@ var mutationType = graphql.NewObject(
 
 			// *  =================== USER MUTATION ===================================== //
 			"create_user": &graphql.Field{
-				Type:        userType,
+				Type:        types.UserType(),
 				Description: "Create new user",
 				Args: graphql.FieldConfigArgument{
 					"name": &graphql.ArgumentConfig{
@@ -276,7 +226,7 @@ var mutationType = graphql.NewObject(
 			},
 
 			"update_user": &graphql.Field{
-				Type:        userType,
+				Type:        types.UserType(),
 				Description: "update user",
 				Args: graphql.FieldConfigArgument{
 					"id": &graphql.ArgumentConfig{
@@ -310,7 +260,7 @@ var mutationType = graphql.NewObject(
 				},
 			},
 			"delete_user": &graphql.Field{
-				Type:        userType,
+				Type:        types.UserType(),
 				Description: "delete user",
 				Args: graphql.FieldConfigArgument{
 					"id": &graphql.ArgumentConfig{
