@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"graphql-intro/connection"
 	"graphql-intro/models"
 	"graphql-intro/seeders"
@@ -93,6 +92,20 @@ var userType = graphql.NewObject(
 	},
 )
 
+var provinceType = graphql.NewObject(
+	graphql.ObjectConfig{
+		Name: "Province",
+		Fields: graphql.Fields{
+			"id": &graphql.Field{
+				Type: graphql.Int,
+			},
+			"name": &graphql.Field{
+				Type: graphql.String,
+			},
+		},
+	},
+)
+
 var queryType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "Query",
@@ -109,6 +122,16 @@ var queryType = graphql.NewObject(
 				Description: "Get User List",
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					return users, nil
+				},
+			},
+			"province_list": &graphql.Field{
+				Type:        graphql.NewList(provinceType),
+				Description: "Get Province List",
+				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+					db := connection.Connect()
+					var provinces []models.Provinces
+					db.Find(&provinces)
+					return provinces, nil
 				},
 			},
 		},
@@ -293,6 +316,69 @@ var mutationType = graphql.NewObject(
 				},
 			},
 			// *  =================== END OF USER MUTATION ===================================== //
+
+			"create_province": &graphql.Field{
+				Type:        provinceType,
+				Description: "Create new province",
+				Args: graphql.FieldConfigArgument{
+					"name": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+				},
+				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+					db := connection.Connect()
+					rand.Seed(time.Now().UnixNano())
+					province := models.Provinces{
+						ID:   int(rand.Intn(100000)),
+						Name: params.Args["name"].(string),
+					}
+					db.Create(&province)
+
+					return province, nil
+				},
+			},
+
+			"update_province": &graphql.Field{
+				Type:        provinceType,
+				Description: "update province",
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+					"name": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+				},
+				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+					db := connection.Connect()
+					id, _ := params.Args["id"].(int)
+					name, _ := params.Args["name"].(string)
+
+					province := models.Provinces{}
+					db.Model(&province).Where("id = ?", id).Update("name", name)
+
+					return province, nil
+				},
+			},
+
+			"delete_province": &graphql.Field{
+				Type:        provinceType,
+				Description: "delete province",
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+					db := connection.Connect()
+					id, _ := params.Args["id"].(int)
+					var province = models.Provinces{}
+					db.Delete(&province, id)
+
+					return province, nil
+				},
+			},
+			// * ==========================================================
 		},
 	},
 )
@@ -338,7 +424,7 @@ func main() {
 		// }
 		// query.Query
 		result := ExecuteQuery(query.Query, schema)
-		fmt.Println(result)
+		// fmt.Println(result)
 		c.JSON(http.StatusOK, result)
 	})
 	r.Run()

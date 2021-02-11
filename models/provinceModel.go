@@ -1,9 +1,7 @@
 package models
 
-import "gorm.io/gorm"
-
 // Provinces model
 type Provinces struct {
-	gorm.Model
+	ID   int
 	Name string
 }
