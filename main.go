@@ -162,14 +162,7 @@ var mutationType = graphql.NewObject(
 			"create_user": &graphql.Field{
 				Type:        types.UserType(),
 				Description: "Create new user",
-				Args: graphql.FieldConfigArgument{
-					"name": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.String),
-					},
-					"age": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.Int),
-					},
-				},
+				Args:        gqlargs.DeleteUserArgs(),
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					rand.Seed(time.Now().UnixNano())
 					user := User{
@@ -185,17 +178,7 @@ var mutationType = graphql.NewObject(
 			"update_user": &graphql.Field{
 				Type:        types.UserType(),
 				Description: "update user",
-				Args: graphql.FieldConfigArgument{
-					"id": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.Int),
-					},
-					"name": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.String),
-					},
-					"age": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.Int),
-					},
-				},
+				Args:        gqlargs.UpdateUserArgs(),
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					id, _ := params.Args["id"].(int)
 					name, _ := params.Args["name"].(string)
@@ -219,10 +202,7 @@ var mutationType = graphql.NewObject(
 			"delete_user": &graphql.Field{
 				Type:        types.UserType(),
 				Description: "delete user",
-				Args: graphql.FieldConfigArgument{
-					"id": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.Int),
-					},
+				Args: gqlargs.DeleteUserArgs(),
 				},
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					id, _ := params.Args["id"].(int)
