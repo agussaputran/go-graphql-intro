@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"graphql-intro/connection"
+	"graphql-intro/models"
+	"graphql-intro/seeders"
 	"log"
 	"math/rand"
 	"net/http"
@@ -314,6 +317,11 @@ func ExecuteQuery(query string, schema graphql.Schema) *graphql.Result {
 }
 
 func main() {
+	pgDB := connection.Connect()
+
+	models.Migrations(pgDB)
+	seeders.SeedProvince(pgDB)
+
 	r := gin.Default()
 	r.POST("/", func(c *gin.Context) {
 
