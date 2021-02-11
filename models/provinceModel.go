@@ -2,6 +2,7 @@ package models
 
 // Provinces model
 type Provinces struct {
-	ID   int
-	Name string
+	ID       uint        `gorm:"primarykey" json:"id"`
+	Name     string      `json:"name"`
+	District []Districts `gorm:"ForeignKey:ProvinceID" json:"districts"`
 }

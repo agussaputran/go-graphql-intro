@@ -92,6 +92,20 @@ var userType = graphql.NewObject(
 	},
 )
 
+var districtType = graphql.NewObject(
+	graphql.ObjectConfig{
+		Name: "District",
+		Fields: graphql.Fields{
+			"id": &graphql.Field{
+				Type: graphql.Int,
+			},
+			"name": &graphql.Field{
+				Type: graphql.String,
+			},
+		},
+	},
+)
+
 var provinceType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "Province",
@@ -101,6 +115,9 @@ var provinceType = graphql.NewObject(
 			},
 			"name": &graphql.Field{
 				Type: graphql.String,
+			},
+			"districts": &graphql.Field{
+				Type: graphql.NewList(districtType),
 			},
 		},
 	},
@@ -129,9 +146,9 @@ var queryType = graphql.NewObject(
 				Description: "Get Province List",
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					db := connection.Connect()
-					var provinces []models.Provinces
-					db.Find(&provinces)
-					return provinces, nil
+					var province []models.Provinces
+					db.Preload("District").Find(&province)
+					return province, nil
 				},
 			},
 		},
@@ -328,10 +345,10 @@ var mutationType = graphql.NewObject(
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					db := connection.Connect()
 					rand.Seed(time.Now().UnixNano())
-					province := models.Provinces{
-						ID:   int(rand.Intn(100000)),
-						Name: params.Args["name"].(string),
-					}
+					var province models.Provinces
+					province.ID = uint(rand.Intn(100000))
+					province.Name = params.Args["name"].(string)
+
 					db.Create(&province)
 
 					return province, nil
@@ -407,6 +424,7 @@ func main() {
 
 	models.Migrations(pgDB)
 	seeders.SeedProvince(pgDB)
+	seeders.SeedDistrict(pgDB)
 
 	r := gin.Default()
 	r.POST("/", func(c *gin.Context) {
