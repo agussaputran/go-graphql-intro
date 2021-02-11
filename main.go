@@ -2,6 +2,7 @@ package main
 
 import (
 	"graphql-intro/connection"
+	"graphql-intro/gqlargs"
 	"graphql-intro/models"
 	"graphql-intro/seeders"
 	"graphql-intro/types"
@@ -56,23 +57,6 @@ var users = []User{
 	},
 }
 
-var provinceType = graphql.NewObject(
-	graphql.ObjectConfig{
-		Name: "Province",
-		Fields: graphql.Fields{
-			"id": &graphql.Field{
-				Type: graphql.Int,
-			},
-			"name": &graphql.Field{
-				Type: graphql.String,
-			},
-			"districts": &graphql.Field{
-				Type: graphql.NewList(types.DistrictType()),
-			},
-		},
-	},
-)
-
 var queryType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "Query",
@@ -92,7 +76,7 @@ var queryType = graphql.NewObject(
 				},
 			},
 			"province_list": &graphql.Field{
-				Type:        graphql.NewList(provinceType),
+				Type:        graphql.NewList(types.ProvinceType()),
 				Description: "Get Province List",
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					db := connection.Connect()
@@ -113,17 +97,7 @@ var mutationType = graphql.NewObject(
 			"create_product": &graphql.Field{
 				Type:        types.ProductType(),
 				Description: "Create new product",
-				Args: graphql.FieldConfigArgument{
-					"name": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.String),
-					},
-					"info": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.String),
-					},
-					"price": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.Float),
-					},
-				},
+				Args:        gqlargs.CreateProductArgs(),
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					rand.Seed(time.Now().UnixNano())
 					product := Product{
@@ -139,20 +113,7 @@ var mutationType = graphql.NewObject(
 			"update_product": &graphql.Field{
 				Type:        types.ProductType(),
 				Description: "update product",
-				Args: graphql.FieldConfigArgument{
-					"id": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.Int),
-					},
-					"name": &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-					"info": &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
-					"price": &graphql.ArgumentConfig{
-						Type: graphql.Float,
-					},
-				},
+				Args:        gqlargs.UpdateProductArgs(),
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					id, _ := params.Args["id"].(int)
 					name, _ := params.Args["name"].(string)
@@ -178,11 +139,7 @@ var mutationType = graphql.NewObject(
 			"delete_product": &graphql.Field{
 				Type:        types.ProductType(),
 				Description: "delete product",
-				Args: graphql.FieldConfigArgument{
-					"id": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.Int),
-					},
-				},
+				Args:        gqlargs.DeleteProductArgs(),
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					id, _ := params.Args["id"].(int)
 					var product = Product{}
@@ -285,7 +242,7 @@ var mutationType = graphql.NewObject(
 			// *  =================== END OF USER MUTATION ===================================== //
 
 			"create_province": &graphql.Field{
-				Type:        provinceType,
+				Type:        types.ProvinceType(),
 				Description: "Create new province",
 				Args: graphql.FieldConfigArgument{
 					"name": &graphql.ArgumentConfig{
@@ -306,7 +263,7 @@ var mutationType = graphql.NewObject(
 			},
 
 			"update_province": &graphql.Field{
-				Type:        provinceType,
+				Type:        types.ProvinceType(),
 				Description: "update province",
 				Args: graphql.FieldConfigArgument{
 					"id": &graphql.ArgumentConfig{
@@ -329,7 +286,7 @@ var mutationType = graphql.NewObject(
 			},
 
 			"delete_province": &graphql.Field{
-				Type:        provinceType,
+				Type:        types.ProvinceType(),
 				Description: "delete province",
 				Args: graphql.FieldConfigArgument{
 					"id": &graphql.ArgumentConfig{
