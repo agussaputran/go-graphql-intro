@@ -20,7 +20,7 @@ var schema, _ = graphql.NewSchema(
 )
 
 // ExecuteQuery func
-func ExecuteQuery(query string, schema graphql.Schema) *graphql.Result {
+func executeQuery(query string, schema graphql.Schema) *graphql.Result {
 	result := graphql.Do(graphql.Params{
 		Schema:        schema,
 		RequestString: query,
@@ -54,7 +54,7 @@ func main() {
 		// 	log.Println("error ->", err.Error())
 		// }
 		// query.Query
-		result := ExecuteQuery(query.Query, schema)
+		result := executeQuery(query.Query, schema)
 		// fmt.Println(result)
 		c.JSON(http.StatusOK, result)
 	})
