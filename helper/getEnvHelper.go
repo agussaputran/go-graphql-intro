@@ -11,7 +11,7 @@ import (
 func GetEnvVar(key string) string {
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatalf("Cannot load .env file")
+		log.Println("Cannot load .env file")
 	}
 	return os.Getenv(key)
 }
