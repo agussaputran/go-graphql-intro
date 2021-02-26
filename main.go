@@ -37,6 +37,7 @@ func main() {
 	models.Migrations(pgDB)
 	seeders.SeedProvince(pgDB)
 	seeders.SeedDistrict(pgDB)
+	seeders.SeedUser(pgDB)
 
 	r := gin.Default()
 	r.POST("/", func(c *gin.Context) {
