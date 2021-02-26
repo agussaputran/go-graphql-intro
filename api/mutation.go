@@ -99,7 +99,7 @@ var MutationType = graphql.NewObject(
 							user.Email,
 							user.Role,
 							jwt.StandardClaims{
-								ExpiresAt: time.Now().Add(time.Minute * 15).Unix(),
+								ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 								IssuedAt:  time.Now().Unix(),
 							},
 						}
