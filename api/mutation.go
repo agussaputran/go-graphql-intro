@@ -15,33 +15,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// var products = []models.Product{
-// 	{ID: 1,
-// 		Name:  "Coki-coki",
-// 		Info:  "Coklat + kacang mete",
-// 		Price: 1000.00,
-// 	},
-// 	{
-// 		ID:    2,
-// 		Name:  "Indomie Goreng",
-// 		Info:  "Mie goreng merk indomie",
-// 		Price: 3000.00,
-// 	},
-// }
-
-// var users = []models.User{
-// 	{
-// 		ID:   1,
-// 		Name: "Agus Saputra",
-// 		Age:  23,
-// 	},
-// 	{
-// 		ID:   2,
-// 		Name: "Raymond",
-// 		Age:  40,
-// 	},
-// }
-
 // MutationType global
 var MutationType = graphql.NewObject(
 	graphql.ObjectConfig{
@@ -97,14 +70,7 @@ var MutationType = graphql.NewObject(
 			"login": &graphql.Field{
 				Type:        types.UserLoginType(),
 				Description: "login",
-				Args: graphql.FieldConfigArgument{
-					"email": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.String),
-					},
-					"password": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.String),
-					},
-				},
+				Args:        gqlargs.LoginArgs(),
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					var (
 						db     = connection.Connect()
