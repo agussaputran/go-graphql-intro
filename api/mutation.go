@@ -1,8 +1,10 @@
 package api
 
 import (
+	"fmt"
 	"graphql-intro/connection"
 	"graphql-intro/gqlargs"
+	jwtauth "graphql-intro/jwt-auth"
 	"graphql-intro/models"
 	"graphql-intro/types"
 	"log"
@@ -25,7 +27,18 @@ var MutationType = graphql.NewObject(
 				Description: "Create new province",
 				Args:        gqlargs.CreateProvinceArgs(),
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-					db := connection.Connect()
+					db := *connection.GetConnection()
+
+					token := params.Context.Value("token").(string)
+					verifToken, err := jwtauth.VerifyToken(token)
+					if err != nil {
+						return nil, err
+					}
+					fmt.Println(verifToken["role"])
+					if verifToken["role"] == "guest" {
+						return nil, err
+					}
+
 					rand.Seed(time.Now().UnixNano())
 					var province models.Provinces
 					province.ID = uint(rand.Intn(100000))
@@ -42,7 +55,18 @@ var MutationType = graphql.NewObject(
 				Description: "update province",
 				Args:        gqlargs.UpdateProvinceArgs(),
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-					db := connection.Connect()
+					db := *connection.GetConnection()
+
+					token := params.Context.Value("token").(string)
+					verifToken, err := jwtauth.VerifyToken(token)
+					if err != nil {
+						return nil, err
+					}
+					fmt.Println(verifToken["role"])
+					if verifToken["role"] == "guest" {
+						return nil, err
+					}
+
 					id, _ := params.Args["id"].(int)
 					name, _ := params.Args["name"].(string)
 
@@ -58,7 +82,18 @@ var MutationType = graphql.NewObject(
 				Description: "delete province",
 				Args:        gqlargs.DeleteProvinceArgs(),
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-					db := connection.Connect()
+					db := *connection.GetConnection()
+
+					token := params.Context.Value("token").(string)
+					verifToken, err := jwtauth.VerifyToken(token)
+					if err != nil {
+						return nil, err
+					}
+					fmt.Println(verifToken["role"])
+					if verifToken["role"] != "admin" {
+						return nil, err
+					}
+
 					id, _ := params.Args["id"].(int)
 					var province = models.Provinces{}
 					db.Delete(&province, id)
@@ -73,7 +108,7 @@ var MutationType = graphql.NewObject(
 				Args:        gqlargs.LoginArgs(),
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					var (
-						db     = connection.Connect()
+						db     = *connection.GetConnection()
 						user   models.User
 						result interface{}
 					)

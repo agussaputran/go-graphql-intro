@@ -8,8 +8,10 @@ import (
 	"gorm.io/gorm"
 )
 
+var dbConn *gorm.DB
+
 // Connect to database
-func Connect() *gorm.DB {
+func Connect() {
 
 	var userDB, pwDB, portDB, hostDB, nameDB, sslDB, timeZoneDB string
 	userDB = helper.GetEnvVar("DB_USER")
@@ -34,5 +36,10 @@ func Connect() *gorm.DB {
 	} else {
 		fmt.Println("successful connection")
 	}
-	return db
+	dbConn = db
+}
+
+//GetConnection from DB
+func GetConnection() *gorm.DB {
+	return dbConn
 }

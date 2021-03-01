@@ -1,9 +1,7 @@
 package api
 
 import (
-	"fmt"
 	"graphql-intro/connection"
-	jwtauth "graphql-intro/jwt-auth"
 	"graphql-intro/models"
 	"graphql-intro/types"
 
@@ -19,13 +17,7 @@ var QueryType = graphql.NewObject(
 				Type:        graphql.NewList(types.ProvinceType()),
 				Description: "Get Province List",
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-					token := params.Context.Value("token").(string)
-					verifToken, err := jwtauth.VerifyToken(token)
-					if err != nil {
-						return nil, err
-					}
-					fmt.Println(verifToken["role"])
-					db := connection.Connect()
+					db := *connection.GetConnection()
 					var province []models.Provinces
 					db.Preload("District").Find(&province)
 					return province, nil
