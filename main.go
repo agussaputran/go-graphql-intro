@@ -1,15 +1,18 @@
 package main
 
 import (
+	"context"
 	"graphql-intro/api"
 	"graphql-intro/connection"
 	"graphql-intro/models"
 	"graphql-intro/seeders"
 	"log"
 	"net/http"
+	"os"
 
-	"github.com/gin-gonic/gin"
+	"github.com/go-chi/chi"
 	"github.com/graphql-go/graphql"
+	"github.com/graphql-go/handler"
 )
 
 var schema, _ = graphql.NewSchema(
@@ -19,18 +22,6 @@ var schema, _ = graphql.NewSchema(
 	},
 )
 
-// ExecuteQuery func
-func executeQuery(query string, schema graphql.Schema) *graphql.Result {
-	result := graphql.Do(graphql.Params{
-		Schema:        schema,
-		RequestString: query,
-	})
-	if len(result.Errors) > 0 {
-		log.Println(result.Errors)
-	}
-	return result
-}
-
 func main() {
 	pgDB := connection.Connect()
 
@@ -39,24 +30,32 @@ func main() {
 	seeders.SeedDistrict(pgDB)
 	seeders.SeedUser(pgDB)
 
-	r := gin.Default()
-	r.POST("/", func(c *gin.Context) {
+	routes := chi.NewRouter()
+	r := registerRoutes(routes)
+	log.Println("Server up and run at " + os.Getenv("HOSTNAME") + os.Getenv("PORT"))
+	log.Fatal(http.ListenAndServe(":"+os.Getenv("PORT"), r))
+}
 
-		type Query struct {
-			Query string
-		}
-
-		// buf, _ := ioutil.ReadAll(c.Request.Body)
-		var query Query
-		c.Bind(&query)
-		// err := json.Unmarshal(buf, &query)
-		// if err != nil {
-		// 	log.Println("error ->", err.Error())
-		// }
-		// query.Query
-		result := executeQuery(query.Query, schema)
-		// fmt.Println(result)
-		c.JSON(http.StatusOK, result)
+// RegisterRoutes func
+func registerRoutes(r *chi.Mux) *chi.Mux {
+	/* GraphQL */
+	graphQL := handler.New(&handler.Config{
+		Schema: &schema,
+		Pretty: true,
+		// GraphiQL: true,
+		Playground: true,
 	})
-	r.Run()
+	// r.Use(middleware.Logger)
+	r.Handle("/query", headerAuthorization(graphQL))
+	return r
+}
+
+// Header Authorization
+func headerAuthorization(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var ctx context.Context
+		auth := r.Header.Get("Authorization")
+		ctx = context.WithValue(r.Context(), "token", auth)
+		h.ServeHTTP(w, r.WithContext(ctx))
+	})
 }
